@@ -3,6 +3,7 @@ from tkinter import filedialog
 from tkinter import ttk
 import tkinter.font as Font
 import os
+from help import commands
 from dotenv import find_dotenv, load_dotenv
 from datetime import datetime
 import openpyxl
@@ -192,6 +193,12 @@ def PreviousRow():
     active_row_label.configure(text=f"Row: {active_row}")
     active_row_label.pack(side=TOP, anchor='nw')
 
+def ViewCommands():
+    help_window = Toplevel(root)
+    help_window.title("View Commands")
+    help_window.geometry("500x500")
+    commands_label = Label(help_window, text=commands, bg="gray35", fg="OliveDrab1")
+    commands_label.pack(side=LEFT, anchor="w", )
 def ManageCommand(_):
     last_command = cmd_box.get()
     command = last_command.split()[0]
@@ -247,6 +254,8 @@ def ManageCommand(_):
             MarkRowComplete()
         case 'savexl':
             SaveXLFile()
+        case 'help':
+            ViewCommands()
 
 
 #----------------------------COMMAND LINE----------------------------#
