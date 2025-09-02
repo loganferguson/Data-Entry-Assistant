@@ -1,17 +1,16 @@
 from tkinter import *
-from tkinter import filedialog
 from tkinter import ttk
 import tkinter.font as Font
 import os
 from help import commands
 from dotenv import find_dotenv, load_dotenv
-from datetime import datetime
 import openpyxl
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.alert import Alert
+from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
 root = Tk()
@@ -33,7 +32,7 @@ driver.set_window_position(0, 0)
 driver.set_window_size(screen_width - 5, screen_height - 200)
 driver.get(url)
 
-option_commands = ["openxl", "lr", "dup", "name", "delp", "note", "setnote"]
+option_commands = ["openxl", "lr", "dup", "name", "delp", "note", "setnote", "org"]
 person_options = []
 current_person_index = 0
 xl_fullpath = ""
@@ -48,6 +47,7 @@ xl_space_type = ""
 xl_update_column = ""
 default_note = "Update occupant per DMFC inventory 7/16/2025 - LF"
 
+
 def LoadSheet(filepath):
     global filename
     global xl_fullpath   
@@ -58,7 +58,7 @@ def LoadSheet(filepath):
     global xl_file
     xl_file = openpyxl.load_workbook(xl_fullpath)
     global xl_sheet
-    xl_sheet = xl_file["Current Space Assignments"]
+    xl_sheet = xl_file["MMGE IB 4th FL"]
     active_row_label.pack_forget()
 
 def LoadRow(row):
@@ -67,13 +67,13 @@ def LoadRow(row):
     global xl_org_code
     xl_org_code = xl_sheet.cell(row=active_row, column=3).value
     global xl_building_code
-    xl_building_code = xl_sheet.cell(row=active_row, column=12).value
+    xl_building_code = xl_sheet.cell(row=active_row, column=5).value
     global xl_room_number
-    xl_room_number = xl_sheet.cell(row=active_row, column=14).value
+    xl_room_number = xl_sheet.cell(row=active_row, column=7).value
     global xl_space_type
-    xl_space_type = xl_sheet.cell(row=active_row, column=18).value
+    xl_space_type = xl_sheet.cell(row=active_row, column=12).value
     global xl_update_column
-    xl_update_column = xl_sheet.cell(row=active_row, column=44).value
+    xl_update_column = xl_sheet.cell(row=active_row, column=15).value
     
     if(xl_building_code is not None and xl_room_number is not None):
         for row in xl_table.get_children():
@@ -126,7 +126,7 @@ def AcceptAlert():
     Alert(driver).accept()
 
 def AddPerson():
-    add_person_btn = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/section/div/form/div/div[8]/div[2]/input[1]')
+    add_person_btn = driver.find_element(By.CSS_SELECTOR, "input[value='Add Person']")
     add_person_btn.click()
 
 def EnterName(name: str):
@@ -146,6 +146,15 @@ def DeletePerson(person):
 def ConfirmDeletePerson():
     delete_btn = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/section/div/div/form/div/input')
     delete_btn.click()
+
+def AddOrg(org_code: str):
+    org_dropdown = driver.find_element(By.ID, 'Organization')
+    select_object = Select(org_dropdown)
+    for option in select_object.options:
+        if org_code in option.text:
+            select_object.select_by_visible_text(option.text)
+            break
+
 
 def AddNote(note):
     note_text_area = driver.find_element(By.XPATH, '/html/body/div[1]/div[2]/section/div/form/div/div[10]/div[2]/textarea')
@@ -205,7 +214,6 @@ def ManageCommand(_):
     command_option = ""
     if (command in option_commands):
         command_option = last_command.split(' ', 1)[1]
-        print(command_option)
     cmd_box.delete(0, END)
     match command:
         case 'li':
@@ -236,6 +244,8 @@ def ManageCommand(_):
             AcceptAlert()
         case 'ap':
             AddPerson()
+        case 'org':
+            AddOrg(command_option)
         case 'name':
             EnterName(command_option)
         case 'delp':
