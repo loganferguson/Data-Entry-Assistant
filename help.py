@@ -9,6 +9,9 @@ commands = "" \
 "sp --> navigate to space menu \n\n" \
 "ass --> navigate to assignment menu \n\n" \
 "back --> navigates back to previous page \n\n" \
+"bc --> enter building code \n\n" \
+"rm --> enter room number \n\n" \
+"ed --> select assignment or space to edit (takes 1 argument <int>, select from list ex. ed 1, ed 2) \n\n" \
 "ss --> searches on building and room number from loaded row \n\n" \
 "va --> view assignment \n\n" \
 "dup --> duplicates assignment (takes 1 argument <int>, select assignment from list) \n\n" \
